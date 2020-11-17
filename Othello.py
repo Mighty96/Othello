@@ -19,6 +19,12 @@ game_player1 = pygame.image.load("Images/game/animal1.png")
 game_player2 = pygame.image.load("Images/game/animal2.png")
 game_score = pygame.image.load("Images/game/score.png")
 game_finish = pygame.image.load("Images/game/finish.png")
+game_pass = pygame.image.load("Images/game/pass.png")
+
+explain_background = pygame.image.load("Images/explain/background.png")
+explain_back = pygame.image.load("Images/explain/back.png")
+explain_back_click = pygame.image.load("Images/explain/back_click.png")
+
 
 # 기본 설정
 display_width = 960  # 화면 가로 크기
@@ -48,6 +54,15 @@ class Player:  # 플레이어 행동
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         self.turn = turn
+
+        gameDisplay.blit(game_pass, (810, 580))
+        if 930 > mouse[0] > 810 and 640 > mouse[1] > 580 and click[0] and turn == 1:
+            self.turn = 2
+            time.sleep(0.5)
+        elif 930 > mouse[0] > 810 and 640 > mouse[1] > 580 and click[0] and turn == 2:
+            self.turn = 1
+            time.sleep(0.5)
+
         for i in range(8):
             for j in range(8):
                 if (43 + (i * 70)) < mouse[0] < (113 + (i * 70)) and \
@@ -64,6 +79,7 @@ class Player:  # 플레이어 행동
                             self.turn = 1
 
 
+# 놓으려 하는 자리 주변 체크
 def possible_check(x, y, player, opponent):
     check = False  # 놓을 수 없다고 가정
     if x > 0 and y > 0 and there_is[x - 1][y - 1] == opponent:  # 좌상단
@@ -201,6 +217,7 @@ def possible_check(x, y, player, opponent):
     return check
 
 
+# 시작메뉴
 def mainmenu():
     menu = True
 
@@ -219,6 +236,7 @@ def mainmenu():
         clock.tick(15)
 
 
+# 본게임
 def game():
     gameexit = False
     player_turn = 1
@@ -235,11 +253,13 @@ def game():
 
         count_player1 = 0
         count_player2 = 0
-        gameDisplay.blit(game_background, (0, 0))  # 배경
+        gameDisplay.blit(game_background, (0, 0))
         gameDisplay.blit(game_player_turn, (670, 0))
         gameDisplay.blit(game_score, (670, 250))
         gameDisplay.blit(game_player1, (670, 393))
         gameDisplay.blit(game_player2, (670, 495))
+
+        # 말 그림 놓기
         for i in range(8):
             for j in range(8):
                 if there_is[i][j] == 1:
@@ -251,34 +271,41 @@ def game():
 
         score(count_player1, count_player2)
 
-        if player_turn == 1:
+        if player_turn == 1:    # 1P 턴일 때
             gameDisplay.blit(game_player1, (760, 170))
             player1 = Player(game_player1, player_turn)
             player_turn = player1.turn
-        else:
+        else:                   # 2P 턴일 때
             gameDisplay.blit(game_player2, (760, 170))
             player2 = Player(game_player2, player_turn)
             player_turn = player2.turn
         pygame.display.update()
-        if count_player1 + count_player2 == 64:
+
+        if count_player1 + count_player2 == 64:     # 총 64개의 돌이 놓이면 종료
             gameDisplay.blit(game_finish, (150, 100))
             if count_player1 > count_player2:
                 gameDisplay.blit(game_player1, (450, 300))
-            elif count_player2 < count_player2:
+            elif count_player2 > count_player1:
                 gameDisplay.blit(game_player2, (450, 300))
             else:
                 gameDisplay.blit(game_player1, (350, 300))
                 gameDisplay.blit(game_player2, (550, 300))
+            pygame.display.update()
             time.sleep(5)
+            reset()
             mainmenu()
 
-        clock.tick(60)
+        clock.tick(30)
 
 
-def retry():
-    pass
+# 게임 판 초기화
+def reset():
+    for i in range(8):
+        for j in range(8):
+            there_is[i][j] = 0
 
 
+# 현재 점수 표시
 def score(player1, player2):
     font = pygame.font.SysFont("a두리둥실", 60)
     player1_score = font.render(str(player1), True, Red)
@@ -287,10 +314,23 @@ def score(player1, player2):
     gameDisplay.blit(player2_score, (750, 500))
 
 
+# 설명
 def explain():
-    pass
+    exp = True
+
+    while exp:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        gameDisplay.blit(explain_background, (0, 0))
+        Button(explain_back, 670, 450, 230, 140, explain_back_click, 660, 442, mainmenu)
+
+        pygame.display.update()
+        clock.tick(15)
 
 
+# 게임 종료
 def finishgame():
     pygame.quit()
     sys.exit()
