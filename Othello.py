@@ -259,14 +259,14 @@ def game():
         gameDisplay.blit(game_player1, (670, 393))
         gameDisplay.blit(game_player2, (670, 495))
 
-        # 말 그림 놓기
+         # 말 그림 놓기
         for i in range(8):
             for j in range(8):
                 if there_is[i][j] == 1:
                     gameDisplay.blit(game_player1, (53 + (i * 70), 50 + (j * 70)))
                     count_player1 += 1
                 elif there_is[i][j] == 2:
-                    gameDisplay.blit(game_player2, (53 + (i * 70), 50 + (j * 70)))
+                    gameDisplay.blit(game_player2,(53 + (i * 70), 50 + (j * 70)))
                     count_player2 += 1
 
         score(count_player1, count_player2)
